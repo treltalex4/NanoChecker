@@ -1,4 +1,4 @@
-name: Build NanoChecker APK
+name: Build ML Kit GenAI APK
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -18,25 +18,14 @@ jobs:
         with:
           gradle-version: '8.11.1'
 
-      - name: Restore source
-        shell: bash
-        run: |
-          cat > /tmp/src.b64 <<'EOF'
-          UEsDBBQAAAAIAA21Pl2csBclpwAAAA4BAAAPABwAc2V0dGluZ3MuZ3JhZGxlVVQJAAPZj71q2Y+9
-          anV4CwABBAAAAAAE6QMAAI2OQQrCMBRE9z1FdtWNB1BcSKmgWBuq+xKaIUbT/0OSCiLe3dqlILh8
-          wzBvvBuMpUqRMuhBSTxFgOdoEweLOKJhNg6z+Ur06g4qxlJQ7sMmKO0gpwXJIX1S8RKvTMODNKh7
-          NIjshmT5t6JijUVEmjXf4XazO7T1sZVNvS+Lc9uUsj6N3j8PTlcCc5KBr+jSglSPdX5UxMUF3Q0h
-          zyx1btAQ+VJ5n2dvUEsDBAoAAAAAAA21Pl0AAAAAAAAAAAAAAAAEABwAYXBwL1VUCQAD2Y+9atmP
-          vWp1eAsAAQQAAAAABOkDAABQSwMEFAAAAAgADbU+XTNB0JvyAAAAjQEAABAAHABhcHAvYnVpbGQu
-          Z3JhZGxlVVQJAAPZj71q2Y+9anV4CwABBAAAAAAE6QMAAI2QP2vDMBDF93yK2zxFxJRSiEfTIR0S
-          aCBruUgX9bB0ErLsUkK+e2W7DYUuHe/Pe793F91gWXq4AhuodPAKxaTARmGMjjVmDlLBbfXdhusK
-          QNBTH1ETVIZGJShBv5PuKFVlWkwiOzqaDh4eS23ogoPLbZAL2wL6Zbwzfx0a8CyzuG4gY7KUF6sG
-          Rkp9UbXBENT3cl/SQFWrzRTzjj/ECTAd1ochaWpLuzDP7Dh/wguOeFrk6vT8etwd9m/10w/vP7uF
-          dVsZiiSGRDPNL/TRkSfJ83HLO20I1pHyruO8tSTI60QfiTOL3ZbQarM+U8Z6Cv8FUEsDBAoAAAAA
-          AA21Pl0AAAAAAAAAAAAAAAAIABwAYXBwL3NyYy9VVAkAA9mPvWrZj71qdXgLAAEEAAAAAATpAwAA
-          UEsDBAoAAAAAAA21Pl0AAAAAAAAAAAAAAAANABwAYXBwL3NyYy9tYWluL1VUCQAD2Y+9atmPvWp1
-          eAsAAQQAAAAABOkDAABQSwMECgAAAAAADbU+XQAAAAAAAAAAAAAAABIAHABhcHAvc3JjL21haW4v
-          amF2YS9VVAkAA9mPvWrZj71qdXgLAAEEAAAAAATpAwAAUEsDBAoAAAAAAA21Pl0AAAAAAAAAAAAA
-          AAAWABwAYXBwL3NyYy9tYWluL2phdmEvZGV2L1VUCQAD2Y+9atmPvWp1eAsAAQQAAAAABOkDAABQ
-          SwMECgAAAAAADbU+XQAAAAAAAAAAAAAAACIAHABhcHAvc3JjL21haW4vamF2YS9kZXYvbmFub2No
-          ZWNrZXIvVVQJAAPZj71q2Y+9anV4CwABBAAAAAAE6QMAAFBLAwQUAAAACAANtT5dheluBp0DAAC/
+      - name: Get official ML Kit sample
+        run: git clone --depth 1 https://github.com/googlesamples/mlkit.git src
+
+      - name: Build APK
+        working-directory: src/android/genai
+        run: gradle :app:assembleDebug --stacktrace
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MLKit-GenAI-debug-apk
+          path: src/android/genai/app/build/outputs/apk/debug/app-debug.apk
